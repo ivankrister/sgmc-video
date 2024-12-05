@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
-
 use Illuminate\Support\Facades\Http;
 
 
@@ -11,10 +9,12 @@ Route::view('stream', 'stream');
 Route::get('/video/playlist.m3u8', function () {
     $m3u8Url = 'https://ac01.blodiab.com/sgmc/live.m3u8';
     $referer = 'https://blodiab.com/';
+    $clientIp = '180.191.117.73'; // Simulated client IP
 
-    // Fetch the m3u8 content
+    // Fetch the m3u8 content with the simulated client IP
     $response = Http::withHeaders([
         'Referer' => $referer,
+        'X-Forwarded-For' => $clientIp, // Simulating client IP
     ])->get($m3u8Url);
 
     // Check if the request was successful
@@ -31,10 +31,12 @@ Route::get('/video/playlist.m3u8', function () {
 Route::get('/video/{filename}.ts', function ($filename) {
     $url = 'https://ac01.blodiab.com/sgmc/' . $filename . '.ts';
     $referer = 'https://blodiab.com/';
+    $clientIp = '180.191.117.73'; // Simulated client IP
 
-    // Fetch the .ts segment
+    // Fetch the .ts segment with the simulated client IP
     $response = Http::withHeaders([
         'Referer' => $referer,
+        'X-Forwarded-For' => $clientIp, // Simulating client IP
     ])->get($url);
 
     // Check if the request was successful
