@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
 
-Route::view('stream', 'stream');
 // Route for .m3u8 playlist
 Route::get('/video/playlist.m3u8', function () {
     $m3u8Url = 'https://sgix02.tangolinaction.com/hls/server2/index.m3u8';
