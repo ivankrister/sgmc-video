@@ -1,20 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+
 use Illuminate\Support\Facades\Http;
 
 
 Route::view('stream', 'stream');
 // Route for .m3u8 playlist
 Route::get('/video/playlist.m3u8', function () {
-    $m3u8Url = 'https://ac01.blodiab.com/sgmc/live.m3u8';
-    $referer = 'https://blodiab.com/';
-    $clientIp = '180.191.117.73'; // Simulated client IP
+    $m3u8Url = 'https://sgix02.tangolinaction.com/hls/server2/index.m3u8';
+    $referer = 'https://script.tangolinaction.com';
 
-    // Fetch the m3u8 content with the simulated client IP
+    // Fetch the m3u8 content
+    //add bearer token Bearer BKzrgwjxpF7pwYYEh5IqisddOBWfUBDsloMZ1XHiUwOT02woPIVDg8OXgTs8mkrg
     $response = Http::withHeaders([
         'Referer' => $referer,
-        'X-Forwarded-For' => $clientIp, // Simulating client IP
     ])->get($m3u8Url);
 
     // Check if the request was successful
@@ -24,19 +25,21 @@ Route::get('/video/playlist.m3u8', function () {
             ->header('Cache-Control', 'no-cache');
     }
 
+    dd($response->body());
+
+
+
     return response()->json(['error' => 'Playlist not found'], 404);
 });
 
 // Route for .ts segments
 Route::get('/video/{filename}.ts', function ($filename) {
-    $url = 'https://ac01.blodiab.com/sgmc/' . $filename . '.ts';
-    $referer = 'https://blodiab.com/';
-    $clientIp = '180.191.117.73'; // Simulated client IP
+    $url = 'https://sgix02.tangolinaction.com/hls/server2/' . $filename . '.ts';
+    $referer = 'https://script.tangolinaction.com';
 
-    // Fetch the .ts segment with the simulated client IP
+    // Fetch the .ts segment
     $response = Http::withHeaders([
         'Referer' => $referer,
-        'X-Forwarded-For' => $clientIp, // Simulating client IP
     ])->get($url);
 
     // Check if the request was successful
