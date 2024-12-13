@@ -6,9 +6,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Http;
 
 
+
 // Route for .m3u8 playlist
 Route::get('/video/playlist.m3u8', function () {
-    $m3u8Url = 'https://sgix02.tangolinaction.com/hls/server2/index.m3u8';
+    $m3u8Url = 'https://sgix02.tangolinaction.com/swift/live.m3u8';
     $referer = 'https://script.tangolinaction.com';
 
     // Fetch the m3u8 content
@@ -24,7 +25,6 @@ Route::get('/video/playlist.m3u8', function () {
             ->header('Cache-Control', 'no-cache');
     }
 
-    dd($response->body());
 
 
 
@@ -33,7 +33,7 @@ Route::get('/video/playlist.m3u8', function () {
 
 // Route for .ts segments
 Route::get('/video/{filename}.ts', function ($filename) {
-    $url = 'https://sgix02.tangolinaction.com/hls/server2/' . $filename . '.ts';
+    $url = 'https://sgix02.tangolinaction.com/swift/' . $filename . '.ts';
     $referer = 'https://script.tangolinaction.com';
 
     // Fetch the .ts segment

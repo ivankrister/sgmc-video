@@ -62,6 +62,7 @@
 
         @php
             $src = url('/video/playlist.m3u8');
+            $src = 'http://192.168.254.120:8081/video/playlist.m3u8';
         @endphp
 
         <script>
