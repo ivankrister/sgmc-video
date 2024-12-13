@@ -22,7 +22,7 @@ Route::get('/video/playlist.m3u8', function () {
     if ($response->successful()) {
         return response($response->body(), 200)
             ->header('Content-Type', 'application/vnd.apple.mpegurl')
-            ->header('Cache-Control', 'no-cache');
+            ->header('Cache-Control', 'public, max-age=10');
     }
 
 
@@ -45,7 +45,7 @@ Route::get('/video/{filename}.ts', function ($filename) {
     if ($response->successful()) {
         return response($response->body(), 200)
             ->header('Content-Type', 'video/mp2t')
-            ->header('Cache-Control', 'no-cache');
+            ->header('Cache-Control', 'public, 86400');
     }
 
     return response()->json(['error' => 'Video segment not found'], 404);
