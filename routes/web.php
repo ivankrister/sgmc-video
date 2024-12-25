@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Http;
 
 
 
+Route::view('stream', 'stream');
+
 // Route for .m3u8 playlist
 Route::get('/video/playlist.m3u8', function () {
     $m3u8Url = 'https://sgix02.tangolinaction.com/swift/live.m3u8';
@@ -20,9 +22,15 @@ Route::get('/video/playlist.m3u8', function () {
 
     // Check if the request was successful
     if ($response->successful()) {
-        return response($response->body(), 200)
-            ->header('Content-Type', 'application/vnd.apple.mpegurl')
-            ->header('Cache-Control', 'public, max-age=10');
+
+        $response = response($response->body(), 200)
+        ->header('Content-Type', 'application/vnd.apple.mpegurl')
+        ->header('Cache-Control', 'public, max-age=10');
+
+        //remove cookies
+        $response->headers->remove('Set-Cookie');
+
+        return $response;
     }
 
 
