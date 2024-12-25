@@ -9,13 +9,19 @@ Route::get('/video/playlist.m3u8', function () {
     $m3u8Url = 'https://sgix02.tangolinaction.com/swift/live.m3u8';
     $referer = 'https://script.tangolinaction.com';
 
-    // Fetch the m3u8 content
-    //add bearer token Bearer BKzrgwjxpF7pwYYEh5IqisddOBWfUBDsloMZ1XHiUwOT02woPIVDg8OXgTs8mkrg
+
+    //Cache remember for 1seconds to avoid multiple request
+
+   return Cache::remember('playlist', 2, function () use ($m3u8Url, $referer) {
+        
     $response = Http::withHeaders([
         'Referer' => $referer,
     ])->get($m3u8Url);
 
     // Check if the request was successful
+
+    
+    
     if ($response->successful()) {
 
         $response = response($response->body(), 200)
@@ -37,6 +43,7 @@ Route::get('/video/playlist.m3u8', function () {
 
 
     return response()->json(['error' => 'Playlist not found'], 404);
+    });
 });
 
 
