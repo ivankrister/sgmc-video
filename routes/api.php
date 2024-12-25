@@ -10,40 +10,41 @@ Route::get('/video/playlist.m3u8', function () {
     $referer = 'https://script.tangolinaction.com';
 
 
-    //Cache remember for 1seconds to avoid multiple request
-
-   return Cache::remember('playlist', 2, function () use ($m3u8Url, $referer) {
+    
+   return Cache::flexible('playlist', [1, 5], function () use($m3u8Url, $referer) {
+        $response = Http::withHeaders([
+            'Referer' => $referer,
+        ])->get($m3u8Url);
+    
+        // Check if the request was successful
+    
         
-    $response = Http::withHeaders([
-        'Referer' => $referer,
-    ])->get($m3u8Url);
-
-    // Check if the request was successful
-
+        
+        if ($response->successful()) {
+    
+            $response = response($response->body(), 200)
+                ->header('Accept-Ranges', 'bytes')
+                ->header('Access-Control-Allow-Credentials', 'true')
+                ->header('Access-Control-Allow-Headers', '*')
+                ->header('Access-Control-Allow-Methods', '*')
+                ->header('Access-Control-Allow-Origin', '*')
+                ->header('Access-Control-Expose-Headers', '*')
+                ->header('Cache-Control', 'public, max-age=1')
+                ->header('Content-Length', strlen($response->body()))
+                ->header('Content-Type', 'text/plain; charset=utf-8')
+                ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+    
+            return $response;
+        }
     
     
-    if ($response->successful()) {
-
-        $response = response($response->body(), 200)
-            ->header('Accept-Ranges', 'bytes')
-            ->header('Access-Control-Allow-Credentials', 'true')
-            ->header('Access-Control-Allow-Headers', '*')
-            ->header('Access-Control-Allow-Methods', '*')
-            ->header('Access-Control-Allow-Origin', '*')
-            ->header('Access-Control-Expose-Headers', '*')
-            ->header('Cache-Control', 'public, max-age=1')
-            ->header('Content-Length', strlen($response->body()))
-            ->header('Content-Type', 'text/plain; charset=utf-8')
-            ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
-
-        return $response;
-    }
-
-
-
-
-    return response()->json(['error' => 'Playlist not found'], 404);
+    
+    
+        return response()->json(['error' => 'Playlist not found'], 404);
     });
+
+
+   
 });
 
 
