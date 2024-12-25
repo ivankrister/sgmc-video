@@ -11,7 +11,7 @@ Route::get('/video/playlist.m3u8', function () {
 
 
     
-   return Cache::flexible('playlist', [1, 5], function () use($m3u8Url, $referer) {
+   return Cache::flexible('playlist', [3, 10], function () use($m3u8Url, $referer) {
         $response = Http::withHeaders([
             'Referer' => $referer,
         ])->get($m3u8Url);
@@ -29,7 +29,7 @@ Route::get('/video/playlist.m3u8', function () {
                 ->header('Access-Control-Allow-Methods', '*')
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Expose-Headers', '*')
-                ->header('Cache-Control', 'public, max-age=1')
+                ->header('Cache-Control', 'public, max-age=3')
                 ->header('Content-Length', strlen($response->body()))
                 ->header('Content-Type', 'text/plain; charset=utf-8')
                 ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
@@ -55,7 +55,7 @@ Route::get('/video/{filename}.ts', function ($filename) {
 
     //Cache remember for 30seconds to avoid multiple request
 
-    return Cache::remember('video_' . $filename, 30, function () use ($url, $referer) {
+    return Cache::remember('video_' . $filename, 60, function () use ($url, $referer) {
         // Fetch the .ts segment
         $response = Http::withHeaders([
             'Referer' => $referer,
