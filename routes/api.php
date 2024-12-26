@@ -29,7 +29,7 @@ Route::get('/video/playlist.m3u8', function () {
                 ->header('Access-Control-Allow-Methods', '*')
                 ->header('Access-Control-Allow-Origin', '*')
                 ->header('Access-Control-Expose-Headers', '*')
-                ->header('Cache-Control', 'public, max-age=5')
+                ->header('Cache-Control', 'public, max-age=3')
                 ->header('Content-Length', strlen($response->body()))
                 ->header('Content-Type', 'text/plain; charset=utf-8')
                 ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
