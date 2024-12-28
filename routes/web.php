@@ -4,10 +4,26 @@ use Illuminate\Support\Facades\Route;
 
 
 use Illuminate\Support\Facades\Http;
-
-
+use Illuminate\Support\Uri;
 
 Route::view('stream', 'stream');
+
+Route::get('test-url', function(){
+  
+    $m3u8Url  = "https://playmatic.live/sw.js";
+    $referer = 'https://script.tangolinaction.com';
+
+    $response = Http::withHeaders([
+        'Referer' => $referer,
+        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
+        
+    ])->withOptions([
+        'version' => 2.0, // Ensure HTTP/2 protocol
+    ])->get($m3u8Url);
+    return response($response->getProtocolVersion(), 200);
+
+
+});
 
 // Route for .m3u8 playlist
 Route::get('/video/playlist.m3u8', function () {
