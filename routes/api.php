@@ -9,20 +9,18 @@ Route::get('/video/playlist.m3u8', function () {
     // $m3u8Url = 'https://sgix02.tangolinaction.com/swift/live.m3u8';
     // $referer = 'https://script.tangolinaction.com';
 
-    $m3u8Url = 'https://sv11.turningpoint-v3.com/hls/stream/index.m3u8';
-    $referer = 'https://sv1.turningpoint-v3.com/';
+    $m3u8Url = 'https://a21.streamhub25.site/hls/stream.m3u8';
+    $referer = 'https://194sabong.site/';
+
+   
+
 
 
     $response = Http::withHeaders([
         'Referer' => $referer,
         'User-Agent' => 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36',
-    ])->withOptions([
-        'version' => 2.0,
     ])->get($m3u8Url);
 
-
-
-    dd($response->getBody()->getContents());
 
     // Check if the request was successful
 
@@ -49,7 +47,6 @@ Route::get('/video/playlist.m3u8', function () {
 
 
     return response()->json(['error' => 'Playlist not found'], 404);
-
     
     
 
@@ -58,6 +55,7 @@ Route::get('/video/playlist.m3u8', function () {
    return Cache::flexible('playlist', [3, 6], function () use($m3u8Url, $referer) {
         $response = Http::withHeaders([
             'Referer' => $referer,
+            'User-Agent' => 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36',
         ])->get($m3u8Url);
     
         // Check if the request was successful
@@ -97,8 +95,9 @@ Route::get('/video/{filename}.ts', function ($filename) {
     // $referer = 'https://script.tangolinaction.com';
 
 
-    $url = 'https://sv11.turningpoint-v3.com/hls/stream/' . $filename . '.ts';
-    $referer = 'https://sv1.turningpoint-v3.com';
+    $url = 'https://a21.streamhub25.site/hls/' . $filename . '.ts';
+    $referer = 'https://194sabong.site/';
+ 
 
 
     //Cache remember for 30seconds to avoid multiple request
@@ -107,6 +106,7 @@ Route::get('/video/{filename}.ts', function ($filename) {
         // Fetch the .ts segment
         $response = Http::withHeaders([
             'Referer' => $referer,
+            'User-Agent' => 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36',
         ])->get($url);
 
         // Check if the request was successful

@@ -10,17 +10,24 @@ Route::view('stream', 'stream');
 
 Route::get('test-url', function(){
   
-    $m3u8Url  = "https://playmatic.live/sw.js";
-    $referer = 'https://script.tangolinaction.com';
+    $curlCommand = 'curl -X GET \
+    -H "Referer: https://sv1.turningpoint-v3.com/" \
+    -H "User-Agent: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36" \
+    --http2 \
+    "https://sv11.turningpoint-v3.com/hls/stream/index.m3u8"';
 
-    $response = Http::withHeaders([
-        'Referer' => $referer,
-        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
-        
-    ])->withOptions([
-        'version' => 2.0, // Ensure HTTP/2 protocol
-    ])->get($m3u8Url);
-    return response($response->getProtocolVersion(), 200);
+    // Execute the command
+    $output = [];
+    exec($curlCommand, $output, $returnCode);
+
+    // Check the execution result
+    if ($returnCode === 0) {
+        // Command was successful, display the output
+        echo "<pre>" . implode("\n", $output) . "</pre>";
+    } else {
+        // Command failed
+        echo "Error executing curl command. Return code: $returnCode";
+    }
 
 
 });
