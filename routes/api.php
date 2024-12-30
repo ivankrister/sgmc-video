@@ -9,7 +9,7 @@ Route::get('/video/playlist.m3u8', function () {
     // $m3u8Url = 'https://sgix02.tangolinaction.com/swift/live.m3u8';
     // $referer = 'https://script.tangolinaction.com';
 
-    $m3u8Url = 'https://a21.streamhub25.site/hls/stream.m3u8';
+    $m3u8Url = 'https://a25.streamhub25.site/hls/stream.m3u8';
     $referer = 'https://194sabong.site/';
 
    
@@ -95,7 +95,7 @@ Route::get('/video/{filename}.ts', function ($filename) {
     // $referer = 'https://script.tangolinaction.com';
 
 
-    $url = 'https://a21.streamhub25.site/hls/' . $filename . '.ts';
+    $url = 'https://a25.streamhub25.site/hls/' . $filename . '.ts';
     $referer = 'https://194sabong.site/';
  
 
