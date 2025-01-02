@@ -22,7 +22,7 @@ Route::get('/video/playlist.m3u8', function () {
 
 
     
-   return Cache::flexible('playlist', [3, 6], function () use($m3u8Url, $referer) {
+   return Cache::flexible('playlist', [2, 4], function () use($m3u8Url, $referer) {
     
     $response = Http::withHeaders([
         'Referer' => $referer,
