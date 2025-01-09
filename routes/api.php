@@ -36,7 +36,7 @@ Route::get('/video/playlist.m3u8', function () {
     //     return $response;
     // }
 
-    return response()->json(['error' => 'Playlist not found'], 404);
+    // return response()->json(['error' => 'Playlist not found'], 404);
 
     return Cache::remember('video_playlist', 3, function () use ($m3u8Url, $referer) {
         //return Cache::flexible('playlist', [2, 4], function () use ($m3u8Url, $referer) {
