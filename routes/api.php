@@ -16,10 +16,7 @@ Route::get('/video/playlist.m3u8', function () {
     $origin = 'https://sv1.turningpoint-v3.com';
 
 
-    return Cache::remember('video_playlist', 3, function () use ($m3u8Url, $referer,$origin) {
-        //return Cache::flexible('playlist', [2, 4], function () use ($m3u8Url, $referer) {
-
-        $response = Http::withHeaders([
+    return $response = Http::withHeaders([
             'Accept' => '*/*',
             'Accept-Language' => 'en-US,en;q=0.9',
             'Origin' => $origin,
@@ -50,7 +47,6 @@ Route::get('/video/playlist.m3u8', function () {
 
         return response()->json(['error' => 'Playlist not found'], 404);
 
-    });
 
 });
 
