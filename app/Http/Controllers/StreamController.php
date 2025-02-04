@@ -35,7 +35,7 @@ public function getVideoPlaylist($m3u8Url, $referer, $origin)
     }
 
     // Prevent multiple requests at the same time
-    $lock = Cache::lock($lockKey, 1);
+    $lock = Cache::lock($lockKey, 2);
 
     if ($lock->get()) {
         try {
@@ -53,7 +53,7 @@ public function getVideoPlaylist($m3u8Url, $referer, $origin)
                 $body = $response->body();
 
                 // Store the response in cache for 1 second
-                Cache::store('octane')->put($cacheKey, $body, now()->addSeconds(1));
+                Cache::store('octane')->put($cacheKey, $body, now()->addSeconds(2));
 
                 return response($body, 200)
                     ->header('Content-Type', 'text/plain; charset=utf-8')
