@@ -16,7 +16,7 @@ Route::get('/video/playlist.m3u8', function () {
     $origin = 'https://sv1.turningpoint-v3.com';
 
 
-    return Cache::remember('video_playlist', 1, function () use ($m3u8Url, $referer,$origin) {
+    return Cache::store('octane')->remember('video_playlist', 1, function () use ($m3u8Url, $referer,$origin) {
         $response = Http::withHeaders([
             'Accept' => '*/*',
             'Accept-Language' => 'en-US,en;q=0.9',
