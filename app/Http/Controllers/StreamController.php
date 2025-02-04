@@ -52,7 +52,8 @@ public function getVideoPlaylist($m3u8Url, $referer, $origin)
             if ($response->successful()) {
                 $body = $response->body();
 
-                Cache::store('octane')->put($cacheKey, $body, 1);
+                // Store the response in cache for 1 second
+                Cache::store('octane')->put($cacheKey, $body, now()->addSeconds(1));
 
                 return response($body, 200)
                     ->header('Content-Type', 'text/plain; charset=utf-8')
