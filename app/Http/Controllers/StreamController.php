@@ -22,6 +22,14 @@ class StreamController extends Controller
 
     }
 
+    public function show($filename){
+        $url = 'https://sv11.turningpoint-v3.com:443/hls/stream/'.$filename.'.ts';
+        $referer = 'https://sv1.turningpoint-v3.com/';
+        $origin = 'https://sv1.turningpoint-v3.com';
+
+        return $this->getVideoSegment($filename, $url, $referer, $origin);
+    }
+
     public function getVideoPlaylist($m3u8Url, $referer, $origin)
     {
         $cacheKey = 'video_playlist_' . md5($m3u8Url);
@@ -75,5 +83,68 @@ class StreamController extends Controller
                 : response()->json(['error' => 'Fetching playlist, try again'], 503);
         }
     }
+
+   public function getVideoSegment($filename, $url, $referer, $origin)
+   {
+       $cacheKey = 'video_' . md5($filename);
+       $lockKey = 'video_lock_' . md5($filename);
+   
+       // Serve cached response instantly if available
+       if (Cache::has($cacheKey)) {
+           return response(Cache::get($cacheKey), 200)
+               ->header('Content-Type', 'application/octet-stream')
+               ->header('Cache-Control', 'public, max-age=120');
+       }
+   
+       // Prevent multiple requests at the same time
+       $lock = Cache::lock($lockKey, 5); // Prevents multiple requests for 5 seconds
+   
+       if ($lock->get()) {
+           try {
+               $response = Http::withHeaders([
+                   'Accept'             => '*/*',
+                   'Accept-Language'    => 'en-US,en;q=0.9',
+                   'Origin'             => $origin,
+                   'Referer'            => $referer,
+                   'User-Agent'         => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+               ])->withOptions([
+                   'version' => 2.0, // Use HTTP/2 for better performance
+               ])->get($url);
+   
+               if ($response->successful()) {
+                   $body = $response->body();
+   
+                   // Store in cache for 120 seconds
+                   Cache::put($cacheKey, $body, now()->addSeconds(120));
+   
+                   return response($body, 200)
+                       ->header('Accept-Ranges', 'bytes')
+                       ->header('Access-Control-Allow-Credentials', 'true')
+                       ->header('Access-Control-Allow-Headers', '*')
+                       ->header('Access-Control-Allow-Methods', '*')
+                       ->header('Access-Control-Allow-Origin', '*')
+                       ->header('Access-Control-Expose-Headers', '*')
+                       ->header('Cache-Control', 'public, max-age=120')
+                       ->header('Content-Length', strlen($body))
+                       ->header('Content-Type', 'application/octet-stream')
+                       ->header('Last-Modified', gmdate('D, d M Y H:i:s') . ' GMT');
+               }
+   
+               throw new \Exception("Failed to fetch video segment from URL: {$url}");
+           } catch (\Exception $e) {
+               Log::error("Video Segment Fetch Error: " . $e->getMessage());
+               return response()->json(['error' => 'Video segment not found'], 404);
+           } finally {
+               // Release the lock after fetching the data
+               $lock->release();
+           }
+       }
+   
+       // If another request is already fetching, return the last cached version (if available)
+       return Cache::has($cacheKey)
+           ? response(Cache::get($cacheKey), 200)->header('Content-Type', 'application/octet-stream')->header('Cache-Control', 'public, max-age=120')
+           : response()->json(['error' => 'Fetching video segment, try again'], 503);
+   }
+
 
 }
