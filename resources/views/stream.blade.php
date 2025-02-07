@@ -3,93 +3,73 @@
 
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.2/video-js.min.css" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.2/alt/video.core.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-        <script
-            src="https://cdn.jsdelivr.net/npm/videojs-contrib-quality-levels@2.0.9/dist/videojs-contrib-quality-levels.min.js">
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/videojs-hls-quality-selector@1.1.1/dist/videojs-hls-quality-selector.min.js">
-        </script>
-        <script src="https://cdn.jsdelivr.net/npm/cdnbye@latest/dist/videojs-hlsjs-plugin.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@swarmcloud/hls/p2p-engine.min.js"></script>
-        <script src="{{ url('js/watermark.min.js') }}"></script>
-
-        <style>
-            html,
-            body {
-                margin: 0;
-                padding: 0;
-                height: 100%;
-                overflow: hidden;
-            }
-
-            .video-container {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-            }
-
-            .video-js {
-                width: 100% !important;
-                height: 100% !important;
-            }
-
-            .video-js .vjs-big-play-button {
-                position: absolute;
-                /* Position it absolutely */
-                left: 50%;
-                /* Move to the center */
-                top: 50%;
-                /* Move to the vertical center */
-                transform: translate(-50%, -50%);
-                /* Adjust to truly center */
-                z-index: 10;
-                /* Ensure it's above other controls */
-            }
-        </style>
+        <title>Video</title>
+        <!-- Clappr Builds -->
+        <script src="//cdn.jsdelivr.net/npm/@clappr/player@0.8/dist/clappr.min.js"></script>
+        <!-- P2PEngine -->
+        <script src="//cdn.jsdelivr.net/npm/@swarmcloud/hls/p2p-engine.min.js"></script>
     </head>
+    <style type="text/css">
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            margin: auto;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+        }
+
+        #player {
+            flex: auto;
+        }
+    </style>
+    <script type="text/javascript">
+        window.addEventListener('resize', function() {
+            document.getElementById('player').style.height = window.innerHeight + 'px';
+        });
+    </script>
 
     <body>
-        <div class="video-container">
-            <video id=video class="video-js" controls preload="auto" width="640" height="264">
-
-            </video>
-        </div>
-
-        @php
-            $src = url('api/video/playlist.m3u8');
-            //$src = 'http://192.168.254.120:8081/video/playlist.m3u8';
-        @endphp
-
+        <div id="player"></div>
         <script>
+            var sources = [
+                'https://ac1.blodiab.com/sgmc/live.m3u8',
+                'https://ac2.blodiab.com/sgmc/live.m3u8',
+                'https://ac3.blodiab.com/sgmc/live.m3u8',
+                'https://ac4.blodiab.com/sgmc/live.m3u8',
+                'https://ac5.blodiab.com/sgmc/live.m3u8',
+                'https://ac6.blodiab.com/sgmc/live.m3u8',
+                'https://ac7.blodiab.com/sgmc/live.m3u8',
+                'https://ac8.blodiab.com/sgmc/live.m3u8',
+                'https://ac9.blodiab.com/sgmc/live.m3u8',
+                'https://ac10.blodiab.com/sgmc/live.m3u8',
+                'https://ac11.blodiab.com/sgmc/live.m3u8',
+                'https://ac12.blodiab.com/sgmc/live.m3u8',
+                'https://ac13.blodiab.com/sgmc/live.m3u8',
+
+            ];
+            var source = "{{ url('api/video/playlist.m3u8') }}";
             var p2pConfig = {
-                logLevel: 'error',
-                swFile: "{{ url('js/sw.js') }}",
+                swFile: './sw.js',
                 live: true,
                 trackerZone: 'hk',
-                useHttpRange: true,
-            };
-            var options = {
-                autoplay: true,
-                controls: true,
-                preload: 'auto',
-                liveui: true,
-                playsinline: true, // Allow inline playback on mobile
-                controlBar: {
-                    fullscreenToggle: false, // Disable fullscreen button
-                    pictureInPictureToggle: false, // Disable picture-in-picture button
-                    playToggle: true, // Keep play button
-                    volumePanel: true, // Keep volume control
-                    qualitySelector: false, // Disable quality selector (if using quality plugin)
+
+            }
+            var player = new Clappr.Player({
+                parentId: "#player",
+                width: '100%',
+                height: '100%',
+                mute: false,
+                autoPlay: true,
+                mediacontrol: {
+                    buttons: "#FF2400"
                 },
-                sources: [{
-                    src: '{!! $src !!}',
-                }, ],
-                html5: {
+                mimeType: "application/x-mpegURL",
+                playback: {
+                    playInline: true,
                     hlsjsConfig: {
                         enableWorker: true,
                         lowLatencyMode: true,
@@ -100,38 +80,17 @@
                         maxLiveSyncPlaybackRate: 1,
                         liveDurationInfinity: true
                     }
-                }
-            };
-            const initP2pEngine = (videojsPlayer, hlsjsInstance) => {
-                if (P2PEngineHls.isSupported()) {
-                    new P2PEngineHls({
-                        hlsjsInstance,
-                        ...p2pConfig
-                    });
-                }
-            }
-            if (videojs.Html5Hlsjs) {
-                videojs.Html5Hlsjs.addHook('beforeinitialize', initP2pEngine);
-                // videojs.Html5Hlsjs.removeHook('beforeinitialize', initP2pEngine);  // remove the hook function when leave page
-            } else {
-                // use ServiceWorker based p2p engine if hls.js is not supported, need additional file sw.js
-                new P2PEngineHls.ServiceWorkerEngine(p2pConfig);
-            }
+                },
+            });
 
             P2PEngineHls.tryRegisterServiceWorker(p2pConfig).then(() => {
-                var player = videojs('video', options);
-
+                player.load({
+                    source: source
+                });
+                p2pConfig.hlsjsInstance = player.core.getCurrentPlayback()?._hls;
+                var engine = new P2PEngineHls(p2pConfig);
             })
-
-            //document read
         </script>
     </body>
-
-
-    <script>
-        setTimeout(function() {
-            location.reload();
-        }, 5400000);
-    </script>
 
 </html>

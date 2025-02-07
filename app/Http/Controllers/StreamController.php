@@ -13,24 +13,23 @@ class StreamController extends Controller
     
     public function index()
     {
-        $m3u8Url = 'https://sv11.turningpoint-v3.com:443/hls/stream/index.m3u8';
+        $m3u8Url = 'https://ac12.blodiab.com/sgmc/live.m3u8';
 
-        $referer = 'https://sv1.turningpoint-v3.com/';
-        $origin = 'https://sv1.turningpoint-v3.com';
+        $referer = 'https://blodiab.com/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, $origin);
+        return $this->getVideoPlaylist($m3u8Url, $referer);
 
     }
 
     public function show($filename){
-        $url = 'https://sv11.turningpoint-v3.com:443/hls/stream/'.$filename.'.ts';
-        $referer = 'https://sv1.turningpoint-v3.com/';
-        $origin = 'https://sv1.turningpoint-v3.com';
+        $url = 'https://ac12.blodiab.com/sgmc/'.$filename.'.ts';
+        $referer = 'https://blodiab.com/';
+       
 
-        return $this->getVideoSegment($filename, $url, $referer, $origin);
+        return $this->getVideoSegment($filename, $url, $referer);
     }
 
-    public function getVideoPlaylist($m3u8Url, $referer, $origin)
+    public function getVideoPlaylist($m3u8Url, $referer)
     {
         $cacheKey = 'video_playlist_' . md5($m3u8Url);
         $lockKey = 'video_playlist_lock_' . md5($m3u8Url);
@@ -41,16 +40,17 @@ class StreamController extends Controller
                 ->header('Content-Type', 'text/plain; charset=utf-8')
                 ->header('Cache-Control', 'public, max-age=1');
         }
+
+        $time = 5;
     
         // Prevent multiple requests at the same time
-        $lock = Cache::lock($lockKey, 1);
+        $lock = Cache::lock($lockKey, $time);
     
         if ($lock->get()) {
             try {
                 $response = Http::withHeaders([
                     'Accept'             => '*/*',
                     'Accept-Language'    => 'en-US,en;q=0.9',
-                    'Origin'             => $origin,
                     'Referer'            => $referer,
                     'User-Agent'         => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
                 ])->withOptions([
@@ -61,7 +61,7 @@ class StreamController extends Controller
                     $body = $response->body();
     
                     // Store the response in cache for 1 second
-                    Cache::put($cacheKey, $body, now()->addSeconds(1));
+                    Cache::put($cacheKey, $body, now()->addSeconds($time));
     
                     return response($body, 200)
                         ->header('Content-Type', 'text/plain; charset=utf-8')
@@ -84,7 +84,7 @@ class StreamController extends Controller
         }
     }
 
-   public function getVideoSegment($filename, $url, $referer, $origin)
+   public function getVideoSegment($filename, $url, $referer)
    {
        $cacheKey = 'video_' . md5($filename);
        $lockKey = 'video_lock_' . md5($filename);
@@ -97,14 +97,13 @@ class StreamController extends Controller
        }
    
        // Prevent multiple requests at the same time
-       $lock = Cache::lock($lockKey, 5); // Prevents multiple requests for 5 seconds
+       $lock = Cache::lock($lockKey, 120); // Prevents multiple requests for 5 seconds
    
        if ($lock->get()) {
            try {
                $response = Http::withHeaders([
                    'Accept'             => '*/*',
                    'Accept-Language'    => 'en-US,en;q=0.9',
-                   'Origin'             => $origin,
                    'Referer'            => $referer,
                    'User-Agent'         => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
                ])->withOptions([
