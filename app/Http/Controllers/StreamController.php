@@ -60,7 +60,8 @@ class StreamController extends Controller
             ])->get($m3u8Url);
 
             if ($response->successful()) {
-                return $response->body();
+                return response($response->body(), 200)
+                    ->header('Cache-Control', 'public, max-age=1');
             }
 
             throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
@@ -79,7 +80,8 @@ class StreamController extends Controller
             ])->get($m3u8Url);
 
             if ($response->successful()) {
-                return $response->body();
+                return response($response->body(), 200)
+                    ->header('Cache-Control', 'public, max-age=1');
             }
 
             throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
