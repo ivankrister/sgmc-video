@@ -16,7 +16,7 @@ class StreamController extends Controller
 
         $referer = 'https://blodiab.com/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 5);
 
     }
 
@@ -34,7 +34,7 @@ class StreamController extends Controller
 
         $referer = 'https://stm.pcl2023.live/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
 
     }
 
@@ -46,7 +46,7 @@ class StreamController extends Controller
         return $this->getVideoSegment($filename, $url, $referer);
     }
 
-    public function getVideoPlaylist($m3u8Url, $referer)
+    public function getVideoPlaylist($m3u8Url, $referer, $time)
     {
         $cacheKey = 'video_playlist_'.md5($m3u8Url);
         $lockKey = 'video_playlist_lock_'.md5($m3u8Url);
@@ -57,8 +57,6 @@ class StreamController extends Controller
                 ->header('Content-Type', 'text/plain; charset=utf-8')
                 ->header('Cache-Control', 'public, max-age=1');
         }
-
-        $time = 5;
 
         // Prevent multiple requests at the same time
         $lock = Cache::lock($lockKey, $time);
