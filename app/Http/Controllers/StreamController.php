@@ -149,7 +149,7 @@ class StreamController extends Controller
         }
 
         // Prevent multiple requests at the same time
-        $lock = Cache::lock($lockKey, 120); // Prevents multiple requests for 5 seconds
+        $lock = Cache::lock($lockKey, 60); // Prevents multiple requests for 5 seconds
 
         if ($lock->get()) {
             try {
@@ -166,7 +166,7 @@ class StreamController extends Controller
                     $body = $response->body();
 
                     // Store in cache for 120 seconds
-                    Cache::put($cacheKey, $body, now()->addSeconds(120));
+                    Cache::put($cacheKey, $body, now()->addSeconds(60));
 
                     return response($body, 200)
                         ->header('Accept-Ranges', 'bytes')

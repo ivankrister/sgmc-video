@@ -7,4 +7,4 @@ Schedule::call(function () {
     DB::table('cache')
         ->where('expiration', '<', now()->timestamp)
         ->delete();
-})->hourly();
+})->everyTenMinutes();
