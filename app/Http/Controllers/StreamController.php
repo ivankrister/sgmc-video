@@ -34,7 +34,7 @@ class StreamController extends Controller
 
         $referer = 'https://stm.pcl2023.live/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 0);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
 
     }
 
