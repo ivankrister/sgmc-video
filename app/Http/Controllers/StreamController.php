@@ -16,7 +16,7 @@ class StreamController extends Controller
 
         $referer = 'https://blodiab.com/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 3);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
 
     }
 
@@ -34,7 +34,7 @@ class StreamController extends Controller
 
         $referer = 'https://stm.pcl2023.live/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 1);
 
     }
 
