@@ -1,5 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('cache:delete-expired')->hourly();
+Schedule::call(function () {
+    DB::table('cache')
+        ->where('expiration', '<', now()->timestamp)
+        ->delete();
+})->hourly();
