@@ -16,7 +16,7 @@ class StreamController extends Controller
 
         $referer = 'https://blodiab.com/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 5);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 3);
 
     }
 
@@ -34,7 +34,7 @@ class StreamController extends Controller
 
         $referer = 'https://stm.pcl2023.live/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 3);
 
     }
 
@@ -50,6 +50,23 @@ class StreamController extends Controller
     {
         $cacheKey = 'video_playlist_'.md5($m3u8Url);
         $lockKey = 'video_playlist_lock_'.md5($m3u8Url);
+
+        return Cache::flexible($cacheKey, [$time, $time + 3], function () use ($m3u8Url, $referer) {
+            $response = Http::withHeaders([
+                'Accept' => '*/*',
+                'Accept-Language' => 'en-US,en;q=0.9',
+                'Referer' => $referer,
+                'User-Agent' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+            ])->withOptions([
+                'version' => 2.0, // Use HTTP/2 for performance
+            ])->get($m3u8Url);
+
+            if ($response->successful()) {
+                return $response->body();
+            }
+
+            throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
+        });
 
         // Check if a cached version exists
         if (Cache::has($cacheKey)) {
