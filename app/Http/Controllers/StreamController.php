@@ -16,7 +16,7 @@ class StreamController extends Controller
 
         $referer = 'https://blodiab.com/';
 
-        return $this->getVideoPlaylist($m3u8Url, $referer, 3);
+        return $this->getVideoPlaylist($m3u8Url, $referer, 2);
 
     }
 
@@ -69,7 +69,7 @@ class StreamController extends Controller
         $cacheKey = 'video_playlist_'.md5($m3u8Url);
         $lockKey = 'video_playlist_lock_'.md5($m3u8Url);
 
-        return Cache::flexible($cacheKey, [$time, $time + 3], function () use ($m3u8Url, $referer) {
+        return Cache::flexible($cacheKey, [$time, $time + 8], function () use ($m3u8Url, $referer) {
             $response = Http::withHeaders([
                 'Accept' => '*/*',
                 'Accept-Language' => 'en-US,en;q=0.9',
@@ -149,7 +149,7 @@ class StreamController extends Controller
         }
 
         // Prevent multiple requests at the same time
-        $lock = Cache::lock($lockKey, 60); // Prevents multiple requests for 5 seconds
+        $lock = Cache::lock($lockKey, 120); // Prevents multiple requests for 5 seconds
 
         if ($lock->get()) {
             try {
@@ -166,7 +166,7 @@ class StreamController extends Controller
                     $body = $response->body();
 
                     // Store in cache for 120 seconds
-                    Cache::put($cacheKey, $body, now()->addSeconds(60));
+                    Cache::put($cacheKey, $body, now()->addSeconds(120));
 
                     return response($body, 200)
                         ->header('Accept-Ranges', 'bytes')
