@@ -81,7 +81,7 @@ class StreamController extends Controller
 
             if ($response->successful()) {
                 return response($response->body(), 200)
-                    ->header('Cache-Control', 'public, max-age=1');
+                    ->header('Cache-Control', 'public, max-age=2');
             }
 
             throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
@@ -91,7 +91,7 @@ class StreamController extends Controller
         if (Cache::has($cacheKey)) {
             return response(Cache::get($cacheKey), 200)
                 ->header('Content-Type', 'text/plain; charset=utf-8')
-                ->header('Cache-Control', 'public, max-age=1');
+                ->header('Cache-Control', 'public, max-age=2');
         }
 
         // Prevent multiple requests at the same time
@@ -116,7 +116,7 @@ class StreamController extends Controller
 
                     return response($body, 200)
                         ->header('Content-Type', 'text/plain; charset=utf-8')
-                        ->header('Cache-Control', 'public, max-age=1');
+                        ->header('Cache-Control', 'public, max-age=2');
                 }
 
                 throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
@@ -131,7 +131,7 @@ class StreamController extends Controller
         } else {
             // If another request is already processing, return the last known version (if available)
             return Cache::has($cacheKey)
-                ? response(Cache::get($cacheKey), 200)->header('Content-Type', 'text/plain; charset=utf-8')->header('Cache-Control', 'public, max-age=1')
+                ? response(Cache::get($cacheKey), 200)->header('Content-Type', 'text/plain; charset=utf-8')->header('Cache-Control', 'public, max-age=2')
                 : response()->json(['error' => 'Fetching playlist, try again'], 503);
         }
     }
