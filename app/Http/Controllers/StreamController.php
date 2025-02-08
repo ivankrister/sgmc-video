@@ -12,7 +12,7 @@ class StreamController extends Controller
 {
     public function index()
     {
-        $m3u8Url = 'https://ac12.blodiab.com/sgmc/live.m3u8';
+        $m3u8Url = 'https://ac08.blodiab.com/sgmc/live.m3u8';
 
         $referer = 'https://blodiab.com/';
 
@@ -22,7 +22,7 @@ class StreamController extends Controller
 
     public function show($filename)
     {
-        $url = 'https://ac12.blodiab.com/sgmc/'.$filename.'.ts';
+        $url = 'https://ac08.blodiab.com/sgmc/'.$filename.'.ts';
         $referer = 'https://blodiab.com/';
 
         return $this->getVideoSegment($filename, $url, $referer);
@@ -61,7 +61,7 @@ class StreamController extends Controller
 
             if ($response->successful()) {
                 return response($response->body(), 200)
-                    ->header('Cache-Control', 'public, max-age=1');
+                    ->header('Cache-Control', 'public, max-age=2');
             }
 
             throw new \Exception("Failed to fetch playlist from URL: {$m3u8Url}");
